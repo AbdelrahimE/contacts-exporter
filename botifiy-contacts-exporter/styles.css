@@ -1,0 +1,457 @@
+/* استيراد خط IBM Plex Sans Arabic من Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+
+/* إعادة تعيين الأنماط الافتراضية */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 380px;
+  min-height: 450px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  direction: rtl;
+  overflow-x: hidden;
+}
+
+.container {
+  padding: 25px;
+  background: white;
+  min-height: 450px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* منطقة العنوان */
+.header {
+  text-align: center;
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #25D366;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #666;
+  font-weight: 400;
+}
+
+/* منطقة الحالة */
+.status-area {
+  text-align: center;
+  margin-bottom: 20px;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+/* إحصائيات جهات الاتصال */
+.stats-area {
+  display: flex;
+  justify-content: space-around;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #25D366;
+}
+
+/* فلتر جهات الاتصال */
+.filter-area {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.filter-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 10px 15px;
+  font-size: 15px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-weight: 500;
+  color: #333;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-select:hover {
+  border-color: #25D366;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #25D366;
+  box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
+}
+
+.status-message {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-message.loading {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-message.success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-message.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.count-display {
+  font-size: 32px;
+  font-weight: 700;
+  color: #25D366;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* منطقة الأزرار */
+.button-area {
+  margin-bottom: 20px;
+}
+
+.export-btn {
+  width: 100%;
+  padding: 16px 24px;
+  font-size: 17px;
+  font-weight: 600;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  background: linear-gradient(135deg, #25D366 0%, #20BA5A 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+}
+
+.export-btn:hover {
+  background: linear-gradient(135deg, #20BA5A 0%, #1da851 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+}
+
+.export-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(37, 211, 102, 0.3);
+}
+
+.export-btn:disabled {
+  background: linear-gradient(135deg, #ccc 0%, #999 100%);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+.btn-icon {
+  font-size: 20px;
+  display: inline-block;
+}
+
+.btn-text {
+  font-size: 17px;
+}
+
+/* معلومات إضافية */
+.info {
+  margin-top: auto;
+  padding-top: 15px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.info-text {
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+  margin: 8px 0;
+  font-weight: 400;
+}
+
+/* Footer */
+.footer {
+  margin-top: 15px;
+  text-align: center;
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.footer p {
+  font-size: 11px;
+  color: #999;
+  font-weight: 400;
+}
+
+/* تأثيرات الحركة */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.count-display.animate {
+  animation: pulse 0.5s ease-in-out;
+}
+
+/* 🆕 منطقة فلتر التصنيفات */
+.labels-filter-area {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+/* 🆕 رأس الفلتر مع الأزرار */
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+.filter-header .filter-label {
+  margin: 0;
+  flex: 1;
+}
+
+.labels-select-all {
+  display: flex;
+  gap: 8px;
+}
+
+.small-btn {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-weight: 500;
+  background: white;
+  color: #333;
+  border: 1px solid #25D366;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.small-btn:hover {
+  background: #25D366;
+  color: white;
+}
+
+.small-btn:active {
+  transform: translateY(1px);
+}
+
+.labels-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 5px;
+}
+
+.label-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.label-checkbox-item:hover {
+  background: #e8f5e9;
+  border-color: #25D366;
+}
+
+.label-checkbox-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #25D366;
+}
+
+.label-checkbox-item label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #333;
+}
+
+.label-count {
+  font-size: 12px;
+  color: #666;
+  background: #e0e0e0;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  min-width: 30px;
+  text-align: center;
+}
+
+.selected-labels-info {
+  margin-top: 12px;
+  padding: 10px;
+  background: #e3f2fd;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1976d2;
+  border: 1px solid #bbdefb;
+}
+
+.selected-labels-info span {
+  color: #0d47a1;
+  font-size: 16px;
+}
+
+/* Scrollbar تخصيص */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #25D366;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #20BA5A;
+}
+
+/* 🆕 ملخص التصدير */
+.export-summary {
+  margin: 20px 0;
+  padding: 0;
+}
+
+.summary-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.summary-icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.summary-content {
+  flex: 1;
+}
+
+.summary-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.summary-count {
+  font-size: 22px;
+  color: white;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* تحسينات المسافات */
+.filter-area {
+  margin-bottom: 15px;
+}
+
+.stats-area {
+  margin-bottom: 20px;
+}

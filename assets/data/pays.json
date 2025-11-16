@@ -1,0 +1,215 @@
+[
+    {
+        "title": "You can Subscribe OR Purchase Exports",
+        "desc": "By Subscription, you can access all features without any limitations. By Purchasing Exports, you can also access all features without any limitations, but you can export only up to the purchased number of contacts (exporting one contact multiple times counts as multiple exports)",
+        "package_ids": [
+            "bomosi.ext.ikontacts"
+        ], 
+        "cat1": {
+            "title": "Subscription",
+            "desc": "By subscribing, you get access to all features without any limitations.",
+            "manage_urls": [
+                {
+                    "title": "Stripe",
+                    "url": "https://billing.stripe.com/p/login/9AQdSy8B54za3zG000",
+                    "is_active": true
+                }
+            ],
+            "items": [
+                {
+                    "key": "1m",
+                    "title": "Monthly",
+                    "price_title": "₹747.00 / Month",
+                    "save_title": "₹747.00 billed 1 month",
+                    "button_title": "Subscribe Now!",
+                    "is_active": true,
+                    "url": [
+                        {
+                            "title": "Stripe",
+                            "pay_url": "https://buy.stripe.com/4gwcN15IG4Jlbbq7sQ?prefilled_email=vintestemail",
+                            "is_active": true
+                        }
+                    ]
+                },
+                {
+                    "key": "6m",
+                    "title": "Semiannual",
+                    "price_title": "₹3571.00 / 6 Months",
+                    "save_title": "₹594.56 / month (You save 20%)",
+                    "button_title": "Subscribe Now!",
+                    "is_active": true,
+                    "url": [
+                        {
+                            "title": "Stripe",
+                            "pay_url": "https://buy.stripe.com/5kAaETdb84Jl93ieVj?prefilled_email=vintestemail",
+                            "is_active": true
+                        }
+                    ]
+                },
+                {
+                    "key": "1y",
+                    "title": "Annual",
+                    "price_title": "₹6228.00 / Year",
+                    "save_title": "₹518.98 / month (You save 30%)",
+                    "button_title": "Subscribe Now!",
+                    "is_active": true,
+                    "url": [
+                        {
+                            "title": "Stripe",
+                            "pay_url": "https://buy.stripe.com/9AQbIXdb8a3FfrG4gG?prefilled_email=vintestemail",
+                            "is_active": true
+                        }
+                    ]
+                }
+            ]
+        },
+        "cat2": {
+            "title": "Purchase Exports",
+            "desc": "By Purchasing Exports, you can also access all features without any limitations, but you can export only up to the purchased number of contacts (exporting one contact multiple times counts as multiple exports)",
+            "manage_urls": [
+                {
+                    "title": "Stripe",
+                    "url": "https://billing.stripe.com/p/login/9AQdSy8B54za3zG000",
+                    "is_active": false
+                }
+            ],
+            "items": [
+                {
+                    "key": "1000",
+                    "title": "Export 1000 Contacts",
+                    "price_title": "₹83.00",
+                    "save_title": "₹0.083 / Contact",
+                    "button_title": "Buy Now!",
+                    "is_active": true,
+                    "url": [
+                        {
+                            "title": "Stripe",
+                            "pay_url": "https://buy.stripe.com/3cs9AP1sq4JlbbqcNg?prefilled_email=vintestemail",
+                            "is_active": true
+                        }
+                    ]
+                },
+                {
+                    "key": "5000",
+                    "title": "Export 5000 Contacts",
+                    "price_title": "₹373.00",
+                    "save_title": "₹0.075 / Contact",
+                    "button_title": "Buy Now!",
+                    "is_active": true,
+                    "url": [
+                        {
+                            "title": "Stripe",
+                            "pay_url": "https://buy.stripe.com/3cs14j6MKfnZ7Ze3cH?prefilled_email=vintestemail",
+                            "is_active": true
+                        }
+                    ]
+                },
+                {
+                    "key": "10000",
+                    "title": "Export 10,000 Contacts",
+                    "price_title": "₹664.00",
+                    "save_title": "₹0.066 / Contact",
+                    "button_title": "Buy Now!",
+                    "is_active": true,
+                    "url": [
+                        {
+                            "title": "Stripe",
+                            "pay_url": "https://buy.stripe.com/28o28n2wu2Bd0wM9B6?prefilled_email=vintestemail",
+                            "is_active": true
+                        }
+                    ]
+                },
+                {
+                    "key": "25000",
+                    "title": "Export 25,000 Contacts",
+                    "price_title": "$17.50",
+                    "save_title": "$0.0007 / Contact",
+                    "button_title": "Buy Now!",
+                    "is_active": true,
+                    "url": [
+                        {
+                            "title": "Stripe",
+                            "pay_url": "https://buy.stripe.com/aEU14j5IG1x9bbqdRn?prefilled_email=vintestemail",
+                            "is_active": true
+                        }
+                    ]
+                },
+                {
+                    "key": "50000",
+                    "title": "Export 50,000 Contacts",
+                    "price_title": "$30.00",
+                    "save_title": "$0.0006 / Contact",
+                    "button_title": "Buy Now!",
+                    "is_active": true,
+                    "url": [
+                        {
+                            "title": "Stripe",
+                            "pay_url": "https://buy.stripe.com/7sIfZd8US5Np3IY4gO?prefilled_email=vintestemail",
+                            "is_active": true
+                        }
+                    ]
+                },
+                {
+                    "key": "100000",
+                    "title": "Export 100,000 Contacts",
+                    "price_title": "$50.00",
+                    "save_title": "$0.0005 / Contact",
+                    "button_title": "Buy Now!",
+                    "is_active": true,
+                    "url": [
+                        {
+                            "title": "Stripe",
+                            "pay_url": "https://buy.stripe.com/fZe28nefcb7J6Va3cL?prefilled_email=vintestemail",
+                            "is_active": true
+                        }
+                    ]
+                },
+                {
+                    "key": "500000",
+                    "title": "Export 500,000 Contacts",
+                    "price_title": "$200.00",
+                    "save_title": "$0.0004 / Contact",
+                    "button_title": "Buy Now!",
+                    "is_active": true,
+                    "url": [
+                        {
+                            "title": "Stripe",
+                            "pay_url": "https://buy.stripe.com/8wM9APefc4JlenC5kU?prefilled_email=vintestemail",
+                            "is_active": true
+                        }
+                    ]
+                },
+                {
+                    "key": "1000000",
+                    "title": "Export 1000,000 Contacts",
+                    "price_title": "$300.00",
+                    "save_title": "$0.0003 / Contact",
+                    "button_title": "Buy Now!",
+                    "is_active": true,
+                    "url": [
+                        {
+                            "title": "Stripe",
+                            "pay_url": "https://buy.stripe.com/14kbIX0omfnZbbqaFf?prefilled_email=vintestemail",
+                            "is_active": true
+                        }
+                    ]
+                },
+                {
+                    "key": "2500000",
+                    "title": "Export 2500,000 Contacts",
+                    "price_title": "$500.00",
+                    "save_title": "$0.0002 / Contact",
+                    "button_title": "Buy Now!",
+                    "is_active": true,
+                    "url": [
+                        {
+                            "title": "Stripe",
+                            "pay_url": "https://buy.stripe.com/fZeeV90om4Jl7ZeeVw?prefilled_email=vintestemail",
+                            "is_active": true
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+]

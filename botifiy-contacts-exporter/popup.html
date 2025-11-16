@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Botifiy Contacts Exporter</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <!-- العنوان -->
+    <div class="header">
+      <h1>📱 Botifiy</h1>
+      <p class="subtitle">مُصدّر جهات اتصال واتساب</p>
+    </div>
+
+    <!-- منطقة الحالة -->
+    <div class="status-area">
+      <div id="status" class="status-message">جاهز للتصدير</div>
+      <div id="count" class="count-display"></div>
+    </div>
+
+    <!-- إحصائيات جهات الاتصال -->
+    <div class="stats-area" id="statsArea" style="display: none;">
+      <div class="stat-item">
+        <span class="stat-label">📇 المحفوظة:</span>
+        <span class="stat-value" id="savedCount">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">📋 غير المحفوظة:</span>
+        <span class="stat-value" id="unsavedCount">0</span>
+      </div>
+    </div>
+
+    <!-- فلتر نوع جهات الاتصال -->
+    <div class="filter-area" id="filterArea" style="display: none;">
+      <label class="filter-label">نوع التصدير:</label>
+      <select id="contactFilter" class="filter-select">
+        <option value="all">الكل</option>
+        <option value="saved">المحفوظة فقط</option>
+        <option value="unsaved">غير المحفوظة فقط</option>
+      </select>
+    </div>
+
+    <!-- 🆕 فلتر التصنيفات -->
+    <div class="labels-filter-area" id="labelsFilterArea" style="display: none;">
+      <div class="filter-header">
+        <label class="filter-label">فلترة حسب التصنيفات:</label>
+
+        <!-- أزرار تحديد/إلغاء تحديد الكل -->
+        <div class="labels-select-all">
+          <button id="selectAllLabelsBtn" class="small-btn">تحديد الكل</button>
+          <button id="deselectAllLabelsBtn" class="small-btn">إلغاء الكل</button>
+        </div>
+      </div>
+
+      <!-- قائمة التصنيفات -->
+      <div class="labels-list" id="labelsList">
+        <!-- سيتم ملؤها ديناميكياً -->
+      </div>
+
+      <!-- إحصائيات التصنيفات المحددة -->
+      <div class="selected-labels-info">
+        <span id="selectedLabelsCount">0</span> تصنيف محدد
+      </div>
+    </div>
+
+    <!-- 🆕 ملخص التصدير -->
+    <div class="export-summary" id="exportSummary" style="display: none;">
+      <div class="summary-card">
+        <div class="summary-icon">📊</div>
+        <div class="summary-content">
+          <div class="summary-label">سيتم تصدير:</div>
+          <div class="summary-count" id="exportCount">0 جهة اتصال</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- منطقة الأزرار -->
+    <div class="button-area">
+      <button id="exportBtn" class="export-btn">
+        <span class="btn-icon">📥</span>
+        <span class="btn-text">تصدير جهات الاتصال</span>
+      </button>
+    </div>
+
+    <!-- معلومات إضافية -->
+    <div class="info">
+      <p class="info-text">⚡ سيتم التصدير خلال ثوانٍ معدودة</p>
+      <p class="info-text">🔒 جميع البيانات تبقى محلية وآمنة</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>نسخة 1.0.5</p>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

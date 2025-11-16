@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Botifiy Contacts Exporter",
+  "version": "1.0.5",
+  "description": "تصدير جميع جهات الاتصال من واتساب ويب إلى ملف CSV بسرعة فائقة",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "downloads"
+  ],
+  "host_permissions": [
+    "https://web.whatsapp.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Botifiy Contacts Exporter"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

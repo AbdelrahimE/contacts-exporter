@@ -1,0 +1,40 @@
+{ 
+    "title": "Select one",
+    "desc": "Choose any method; all are safe and secure. If one payment option fails, you can attempt another.",
+    "title_manage": "Select one",
+    "desc_manage": "Choose the option you used to subscribe.",
+    "items": [
+        {
+            "title": "Subscribe using Stripe",
+            "is_active": true,
+            "is_manage_active": true,
+            "pay_url_live_1m": "https://buy.stripe.com/4gwcN15IG4Jlbbq7sQ?prefilled_email=vintestemail",
+            "pay_url_live_6m": "https://buy.stripe.com/5kAaETdb84Jl93ieVj?prefilled_email=vintestemail",
+            "pay_url_live_1y": "https://buy.stripe.com/9AQbIXdb8a3FfrG4gG?prefilled_email=vintestemail",
+            "pay_url_test_1m": "https://buy.stripe.com/4gwcN15IG4Jlbbq7sQ?prefilled_email=vintestemail",
+            "pay_url_test_6m": "https://buy.stripe.com/5kAaETdb84Jl93ieVj?prefilled_email=vintestemail",
+            "pay_url_test_1y": "https://buy.stripe.com/9AQbIXdb8a3FfrG4gG?prefilled_email=vintestemail",
+            "title_manage": "Stripe",
+            "manage_pay_url_live": "https://billing.stripe.com/p/login/9AQdSy8B54za3zG000",
+            "manage_pay_url_test": "https://billing.stripe.com/p/login/9AQdSy8B54za3zG000",
+            "anote":"usd and inr. 6feb24"
+        }
+    ],
+    "flats": [
+        {
+            "title": "Subscribe using Stripe",
+            "is_active": true,
+            "is_manage_active": true,
+            "pay_url_live_1m": "https://buy.stripe.com/4gwcN15IG4Jlbbq7sQ?prefilled_email=vintestemail",
+            "pay_url_live_6m": "https://buy.stripe.com/5kAaETdb84Jl93ieVj?prefilled_email=vintestemail",
+            "pay_url_live_1y": "https://buy.stripe.com/9AQbIXdb8a3FfrG4gG?prefilled_email=vintestemail",
+            "pay_url_test_1m": "https://buy.stripe.com/4gwcN15IG4Jlbbq7sQ?prefilled_email=vintestemail",
+            "pay_url_test_6m": "https://buy.stripe.com/5kAaETdb84Jl93ieVj?prefilled_email=vintestemail",
+            "pay_url_test_1y": "https://buy.stripe.com/9AQbIXdb8a3FfrG4gG?prefilled_email=vintestemail",
+            "title_manage": "Stripe",
+            "manage_pay_url_live": "https://billing.stripe.com/p/login/9AQdSy8B54za3zG000",
+            "manage_pay_url_test": "https://billing.stripe.com/p/login/9AQdSy8B54za3zG000",
+            "anote":"usd and inr. 6feb24"
+        }
+    ]
+}
