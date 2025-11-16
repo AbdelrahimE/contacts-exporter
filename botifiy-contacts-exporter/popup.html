@@ -10,82 +10,171 @@
   <div class="container">
     <!-- العنوان -->
     <div class="header">
-      <h1>📱 Botifiy</h1>
+      <img src="botifiy-logo.png" alt="Botifiy" class="logo">
       <p class="subtitle">مُصدّر جهات اتصال واتساب</p>
     </div>
 
+    <!-- المحتوى القابل للتمرير -->
+    <div class="scrollable-content">
     <!-- منطقة الحالة -->
     <div class="status-area">
       <div id="status" class="status-message">جاهز للتصدير</div>
-      <div id="count" class="count-display"></div>
     </div>
 
-    <!-- إحصائيات جهات الاتصال -->
-    <div class="stats-area" id="statsArea" style="display: none;">
-      <div class="stat-item">
-        <span class="stat-label">📇 المحفوظة:</span>
-        <span class="stat-value" id="savedCount">0</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">📋 غير المحفوظة:</span>
-        <span class="stat-value" id="unsavedCount">0</span>
-      </div>
-    </div>
-
-    <!-- فلتر نوع جهات الاتصال -->
-    <div class="filter-area" id="filterArea" style="display: none;">
-      <label class="filter-label">نوع التصدير:</label>
-      <select id="contactFilter" class="filter-select">
-        <option value="all">الكل</option>
-        <option value="saved">المحفوظة فقط</option>
-        <option value="unsaved">غير المحفوظة فقط</option>
-      </select>
-    </div>
-
-    <!-- 🆕 فلتر التصنيفات -->
-    <div class="labels-filter-area" id="labelsFilterArea" style="display: none;">
-      <div class="filter-header">
-        <label class="filter-label">فلترة حسب التصنيفات:</label>
-
-        <!-- أزرار تحديد/إلغاء تحديد الكل -->
-        <div class="labels-select-all">
-          <button id="selectAllLabelsBtn" class="small-btn">تحديد الكل</button>
-          <button id="deselectAllLabelsBtn" class="small-btn">إلغاء الكل</button>
+    <!-- 🆕 بطاقة الإجمالي -->
+    <div class="summary-total-card" id="summaryTotalCard" style="display: none;">
+      <div class="total-header">
+        <span class="total-icon">👥</span>
+        <div class="total-info">
+          <div class="total-label">إجمالي العملاء المتاحين للتصدير:</div>
+          <div class="total-count" id="totalContactsCount">0</div>
         </div>
       </div>
-
-      <!-- قائمة التصنيفات -->
-      <div class="labels-list" id="labelsList">
-        <!-- سيتم ملؤها ديناميكياً -->
-      </div>
-
-      <!-- إحصائيات التصنيفات المحددة -->
-      <div class="selected-labels-info">
-        <span id="selectedLabelsCount">0</span> تصنيف محدد
-      </div>
-    </div>
-
-    <!-- 🆕 ملخص التصدير -->
-    <div class="export-summary" id="exportSummary" style="display: none;">
-      <div class="summary-card">
-        <div class="summary-icon">📊</div>
-        <div class="summary-content">
-          <div class="summary-label">سيتم تصدير:</div>
-          <div class="summary-count" id="exportCount">0 جهة اتصال</div>
-        </div>
+      <div class="total-breakdown">
+        <span class="breakdown-item">
+          <span class="breakdown-label">محفوظ:</span>
+          <span class="breakdown-value" id="savedCountTotal">0</span>
+        </span>
+        <span class="breakdown-divider">|</span>
+        <span class="breakdown-item">
+          <span class="breakdown-label">غير محفوظ:</span>
+          <span class="breakdown-value" id="unsavedCountTotal">0</span>
+        </span>
       </div>
     </div>
 
-    <!-- منطقة الأزرار -->
-    <div class="button-area">
-      <button id="exportBtn" class="export-btn">
-        <span class="btn-icon">📥</span>
-        <span class="btn-text">تصدير جهات الاتصال</span>
+    <!-- 🆕 Accordion للفلاتر -->
+    <div class="filter-accordion" id="filterAccordion" style="display: none;">
+      <button class="accordion-header" id="accordionToggle">
+        <span class="accordion-title">▼ اختيار نوع التصدير</span>
+        <span class="accordion-hint">الكل</span>
       </button>
+
+      <div class="accordion-content" id="accordionContent">
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="exportType" value="all" checked>
+            <span class="radio-label">كل الأرقام</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="exportType" value="saved">
+            <span class="radio-label">جهات الاتصال المحفوظة فقط</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="exportType" value="unsaved">
+            <span class="radio-label">جهات الاتصال الغير محفوظة فقط</span>
+          </label>
+          <label class="radio-item" id="labelFilterRadio" style="display: none;">
+            <input type="radio" name="exportType" value="labels">
+            <span class="radio-label">تصدير العملاء حسب التصنيفات</span>
+          </label>
+          <label class="radio-item" id="countriesFilterRadio" style="display: none;">
+            <input type="radio" name="exportType" value="countries">
+            <span class="radio-label">تصدير العملاء حسب الدولة</span>
+          </label>
+        </div>
+
+        <!-- 🆕 زر اختيار التصنيفات (يظهر عند اختيار "حسب التصنيفات") -->
+        <div class="labels-trigger-area" id="labelsTriggerArea" style="display: none;">
+          <button class="labels-trigger-btn" id="openLabelsModal">
+            <span class="btn-icon">🏷️</span>
+            <span class="btn-text">اختيار التصنيفات</span>
+          </button>
+          <div class="selected-labels-summary" id="selectedLabelsSummary">
+            لم يتم اختيار أي تصنيف
+          </div>
+        </div>
+
+        <!-- 🆕 زر اختيار الدول (يظهر عند اختيار "حسب الدولة") -->
+        <div class="labels-trigger-area" id="countriesTriggerArea" style="display: none;">
+          <button class="labels-trigger-btn" id="openCountriesModal">
+            <span class="btn-icon">🌍</span>
+            <span class="btn-text">اختيار الدول</span>
+          </button>
+          <div class="selected-labels-summary" id="selectedCountriesSummary">
+            لم يتم اختيار أي دولة
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🆕 Modal التصنيفات -->
+    <div class="modal-overlay" id="labelsModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h3>اختيار التصنيفات</h3>
+          <button class="modal-close" id="closeLabelsModal">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- مربع البحث -->
+          <div class="search-box">
+            <input type="text" id="labelsSearch" placeholder="🔍 ابحث في التصنيفات..." />
+          </div>
+
+          <!-- أزرار التحكم -->
+          <div class="modal-controls">
+            <button id="modalSelectAll" class="control-btn">تحديد الكل</button>
+            <button id="modalDeselectAll" class="control-btn">إلغاء الكل</button>
+          </div>
+
+          <!-- قائمة التصنيفات -->
+          <div class="modal-labels-list" id="modalLabelsList">
+            <!-- سيتم ملؤها ديناميكياً -->
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="modal-done-btn" id="modalDoneBtn">تم</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🆕 Modal الدول -->
+    <div class="modal-overlay" id="countriesModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h3>اختيار الدول</h3>
+          <button class="modal-close" id="closeCountriesModal">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- مربع البحث -->
+          <div class="search-box">
+            <input type="text" id="countriesSearch" placeholder="🔍 ابحث في الدول..." />
+          </div>
+
+          <!-- أزرار التحكم -->
+          <div class="modal-controls">
+            <button id="modalSelectAllCountries" class="control-btn">تحديد الكل</button>
+            <button id="modalDeselectAllCountries" class="control-btn">إلغاء الكل</button>
+          </div>
+
+          <!-- قائمة الدول -->
+          <div class="modal-labels-list" id="modalCountriesList">
+            <!-- سيتم ملؤها ديناميكياً -->
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="modal-done-btn" id="modalCountriesDoneBtn">تم</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🆕 بطاقة الملخص النهائي -->
+    <div class="final-summary" id="finalSummary" style="display: none;">
+      <div class="summary-icon">📋</div>
+      <div class="summary-text">
+        <div class="summary-title">الملخص:</div>
+        <div class="summary-description" id="summaryDescription">
+          سيتم تصدير <strong id="exportCountFinal">0</strong> جهة اتصال وفق الإعدادات المختارة.
+        </div>
+      </div>
     </div>
 
     <!-- معلومات إضافية -->
-    <div class="info">
+    <div class="info" id="infoArea" style="display: none;">
       <p class="info-text">⚡ سيتم التصدير خلال ثوانٍ معدودة</p>
       <p class="info-text">🔒 جميع البيانات تبقى محلية وآمنة</p>
     </div>
@@ -93,6 +182,16 @@
     <!-- Footer -->
     <div class="footer">
       <p>نسخة 1.0.5</p>
+    </div>
+    </div>
+    <!-- نهاية المحتوى القابل للتمرير -->
+
+    <!-- 🆕 زر التصدير الثابت -->
+    <div class="fixed-export-area">
+      <button id="exportBtn" class="export-btn-fixed" disabled>
+        <span class="btn-icon">⬇️</span>
+        <span class="btn-text">تصدير البيانات الان</span>
+      </button>
     </div>
   </div>
 

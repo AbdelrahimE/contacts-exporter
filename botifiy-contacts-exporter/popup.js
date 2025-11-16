@@ -1,179 +1,731 @@
 // popup.js - منطق الواجهة الرئيسية
 
-// عناصر DOM
+// ==================== DOM Elements ====================
 const exportBtn = document.getElementById('exportBtn');
 const statusDiv = document.getElementById('status');
-const countDiv = document.getElementById('count');
-const statsArea = document.getElementById('statsArea');
-const savedCountSpan = document.getElementById('savedCount');
-const unsavedCountSpan = document.getElementById('unsavedCount');
-const filterArea = document.getElementById('filterArea');
-const contactFilter = document.getElementById('contactFilter');
 
-// 🆕 عناصر DOM للتصنيفات
-const labelsFilterArea = document.getElementById('labelsFilterArea');
-const labelsList = document.getElementById('labelsList');
-const selectAllLabelsBtn = document.getElementById('selectAllLabelsBtn');
-const deselectAllLabelsBtn = document.getElementById('deselectAllLabelsBtn');
-const selectedLabelsCount = document.getElementById('selectedLabelsCount');
+// New UI Elements
+const summaryTotalCard = document.getElementById('summaryTotalCard');
+const totalContactsCount = document.getElementById('totalContactsCount');
+const savedCountTotal = document.getElementById('savedCountTotal');
+const unsavedCountTotal = document.getElementById('unsavedCountTotal');
 
-// 🆕 عناصر DOM لملخص التصدير
-const exportSummary = document.getElementById('exportSummary');
-const exportCount = document.getElementById('exportCount');
+// Accordion Elements
+const filterAccordion = document.getElementById('filterAccordion');
+const accordionToggle = document.getElementById('accordionToggle');
+const accordionContent = document.getElementById('accordionContent');
+const labelFilterRadio = document.getElementById('labelFilterRadio');
 
-// متغير لحفظ جهات الاتصال المستخرجة (لتجنب الاستخراج مرتين)
+// Radio Buttons
+const radioButtons = document.querySelectorAll('input[name="exportType"]');
+
+// Labels Modal Elements
+const labelsTriggerArea = document.getElementById('labelsTriggerArea');
+const openLabelsModalBtn = document.getElementById('openLabelsModal');
+const labelsModal = document.getElementById('labelsModal');
+const closeLabelsModalBtn = document.getElementById('closeLabelsModal');
+const modalLabelsList = document.getElementById('modalLabelsList');
+const labelsSearch = document.getElementById('labelsSearch');
+const modalSelectAll = document.getElementById('modalSelectAll');
+const modalDeselectAll = document.getElementById('modalDeselectAll');
+const modalDoneBtn = document.getElementById('modalDoneBtn');
+const selectedLabelsSummary = document.getElementById('selectedLabelsSummary');
+
+// Final Summary Elements
+const finalSummary = document.getElementById('finalSummary');
+const summaryDescription = document.getElementById('summaryDescription');
+const exportCountFinal = document.getElementById('exportCountFinal');
+
+// Info Area
+const infoArea = document.getElementById('infoArea');
+
+// Countries Modal Elements
+const countriesFilterRadio = document.getElementById('countriesFilterRadio');
+const countriesTriggerArea = document.getElementById('countriesTriggerArea');
+const openCountriesModalBtn = document.getElementById('openCountriesModal');
+const countriesModal = document.getElementById('countriesModal');
+const closeCountriesModalBtn = document.getElementById('closeCountriesModal');
+const modalCountriesList = document.getElementById('modalCountriesList');
+const countriesSearch = document.getElementById('countriesSearch');
+const modalSelectAllCountries = document.getElementById('modalSelectAllCountries');
+const modalDeselectAllCountries = document.getElementById('modalDeselectAllCountries');
+const modalCountriesDoneBtn = document.getElementById('modalCountriesDoneBtn');
+const selectedCountriesSummary = document.getElementById('selectedCountriesSummary');
+
+// ==================== Data Variables ====================
 let cachedContacts = null;
 let cachedTabId = null;
-let contactStats = { saved: 0, unsaved: 0, chat: 0 };
+let contactStats = { saved: 0, unsaved: 0 };
+let availableLabels = [];
+let selectedLabelIds = [];
+let labelAssociations = [];
+let currentExportType = 'all'; // all, saved, unsaved, labels
 
-// 🆕 متغيرات التصنيفات
-let availableLabels = [];     // قائمة التصنيفات المتاحة
-let selectedLabelIds = [];    // التصنيفات المحددة
-let labelAssociations = [];   // 🆕 العلاقات بين التصنيفات والجهات (للأعداد الصحيحة)
+// Countries Variables
+let availableCountries = [];
+let selectedCountryCodes = [];
+let contactsByCountry = {};
 
-// ============================================
-// عند تحميل الصفحة - استخراج وعرض العدد
-// ============================================
+// ==================== Country Codes Database ====================
+const COUNTRY_CODES = {
+  // الدول العربية
+  '966': { name: 'السعودية', flag: '🇸🇦', priority: 1 },
+  '20': { name: 'مصر', flag: '🇪🇬', priority: 1 },
+  '971': { name: 'الإمارات', flag: '🇦🇪', priority: 1 },
+  '965': { name: 'الكويت', flag: '🇰🇼', priority: 1 },
+  '962': { name: 'الأردن', flag: '🇯🇴', priority: 1 },
+  '968': { name: 'عمان', flag: '🇴🇲', priority: 1 },
+  '974': { name: 'قطر', flag: '🇶🇦', priority: 1 },
+  '973': { name: 'البحرين', flag: '🇧🇭', priority: 1 },
+  '967': { name: 'اليمن', flag: '🇾🇪', priority: 1 },
+  '964': { name: 'العراق', flag: '🇮🇶', priority: 1 },
+  '963': { name: 'سوريا', flag: '🇸🇾', priority: 1 },
+  '961': { name: 'لبنان', flag: '🇱🇧', priority: 1 },
+  '970': { name: 'فلسطين', flag: '🇵🇸', priority: 1 },
+  '218': { name: 'ليبيا', flag: '🇱🇾', priority: 1 },
+  '213': { name: 'الجزائر', flag: '🇩🇿', priority: 1 },
+  '216': { name: 'تونس', flag: '🇹🇳', priority: 1 },
+  '212': { name: 'المغرب', flag: '🇲🇦', priority: 1 },
+  '249': { name: 'السودان', flag: '🇸🇩', priority: 1 },
+  '252': { name: 'الصومال', flag: '🇸🇴', priority: 1 },
+  '222': { name: 'موريتانيا', flag: '🇲🇷', priority: 1 },
+  '253': { name: 'جيبوتي', flag: '🇩🇯', priority: 1 },
+  '269': { name: 'جزر القمر', flag: '🇰🇲', priority: 1 },
+  '1': { name: 'الولايات المتحدة/كندا', flag: '🇺🇸', priority: 2 },
+  '44': { name: 'المملكة المتحدة', flag: '🇬🇧', priority: 2 },
+  '33': { name: 'فرنسا', flag: '🇫🇷', priority: 2 },
+  '49': { name: 'ألمانيا', flag: '🇩🇪', priority: 2 },
+  '39': { name: 'إيطاليا', flag: '🇮🇹', priority: 2 },
+  '34': { name: 'إسبانيا', flag: '🇪🇸', priority: 2 },
+  '31': { name: 'هولندا', flag: '🇳🇱', priority: 2 },
+  '32': { name: 'بلجيكا', flag: '🇧🇪', priority: 2 },
+  '41': { name: 'سويسرا', flag: '🇨🇭', priority: 2 },
+  '43': { name: 'النمسا', flag: '🇦🇹', priority: 2 },
+  '45': { name: 'الدنمارك', flag: '🇩🇰', priority: 2 },
+  '46': { name: 'السويد', flag: '🇸🇪', priority: 2 },
+  '47': { name: 'النرويج', flag: '🇳🇴', priority: 2 },
+  '48': { name: 'بولندا', flag: '🇵🇱', priority: 2 },
+  '351': { name: 'البرتغال', flag: '🇵🇹', priority: 2 },
+  '353': { name: 'إيرلندا', flag: '🇮🇪', priority: 2 },
+  '358': { name: 'فنلندا', flag: '🇫🇮', priority: 2 },
+  '30': { name: 'اليونان', flag: '🇬🇷', priority: 2 },
+  '420': { name: 'التشيك', flag: '🇨🇿', priority: 2 },
+  '36': { name: 'المجر', flag: '🇭🇺', priority: 2 },
+  '40': { name: 'رومانيا', flag: '🇷🇴', priority: 2 },
+  '380': { name: 'أوكرانيا', flag: '🇺🇦', priority: 2 },
+  '355': { name: 'ألبانيا', flag: '🇦🇱', priority: 2 },
+  '359': { name: 'بلغاريا', flag: '🇧🇬', priority: 2 },
+  '385': { name: 'كرواتيا', flag: '🇭🇷', priority: 2 },
+  '357': { name: 'قبرص', flag: '🇨🇾', priority: 2 },
+  '372': { name: 'إستونيا', flag: '🇪🇪', priority: 2 },
+  '371': { name: 'لاتفيا', flag: '🇱🇻', priority: 2 },
+  '370': { name: 'ليتوانيا', flag: '🇱🇹', priority: 2 },
+  '352': { name: 'لوكسمبورغ', flag: '🇱🇺', priority: 2 },
+  '389': { name: 'مقدونيا الشمالية', flag: '🇲🇰', priority: 2 },
+  '373': { name: 'مولدوفا', flag: '🇲🇩', priority: 2 },
+  '382': { name: 'الجبل الأسود', flag: '🇲🇪', priority: 2 },
+  '381': { name: 'صربيا', flag: '🇷🇸', priority: 2 },
+  '421': { name: 'سلوفاكيا', flag: '🇸🇰', priority: 2 },
+  '386': { name: 'سلوفينيا', flag: '🇸🇮', priority: 2 },
+  '375': { name: 'بيلاروسيا', flag: '🇧🇾', priority: 2 },
+  '387': { name: 'البوسنة والهرسك', flag: '🇧🇦', priority: 2 },
+  '354': { name: 'آيسلندا', flag: '🇮🇸', priority: 2 },
+  '377': { name: 'موناكو', flag: '🇲🇨', priority: 2 },
+  '378': { name: 'سان مارينو', flag: '🇸🇲', priority: 2 },
+  '356': { name: 'مالطا', flag: '🇲🇹', priority: 2 },
+  '423': { name: 'ليختنشتاين', flag: '🇱🇮', priority: 2 },
+  '376': { name: 'أندورا', flag: '🇦🇩', priority: 2 },
+  '90': { name: 'تركيا', flag: '🇹🇷', priority: 2 },
+  '98': { name: 'إيران', flag: '🇮🇷', priority: 2 },
+  '92': { name: 'باكستان', flag: '🇵🇰', priority: 2 },
+  '91': { name: 'الهند', flag: '🇮🇳', priority: 2 },
+  '86': { name: 'الصين', flag: '🇨🇳', priority: 2 },
+  '81': { name: 'اليابان', flag: '🇯🇵', priority: 2 },
+  '82': { name: 'كوريا الجنوبية', flag: '🇰🇷', priority: 2 },
+  '60': { name: 'ماليزيا', flag: '🇲🇾', priority: 2 },
+  '62': { name: 'إندونيسيا', flag: '🇮🇩', priority: 2 },
+  '66': { name: 'تايلاند', flag: '🇹🇭', priority: 2 },
+  '84': { name: 'فيتنام', flag: '🇻🇳', priority: 2 },
+  '65': { name: 'سنغافورة', flag: '🇸🇬', priority: 2 },
+  '63': { name: 'الفلبين', flag: '🇵🇭', priority: 2 },
+  '880': { name: 'بنغلاديش', flag: '🇧🇩', priority: 2 },
+  '95': { name: 'ميانمار', flag: '🇲🇲', priority: 2 },
+  '977': { name: 'نيبال', flag: '🇳🇵', priority: 2 },
+  '94': { name: 'سريلانكا', flag: '🇱🇰', priority: 2 },
+  '93': { name: 'أفغانستان', flag: '🇦🇫', priority: 2 },
+  '996': { name: 'قيرغيزستان', flag: '🇰🇬', priority: 2 },
+  '998': { name: 'أوزبكستان', flag: '🇺🇿', priority: 2 },
+  '992': { name: 'طاجيكستان', flag: '🇹🇯', priority: 2 },
+  '993': { name: 'تركمانستان', flag: '🇹🇲', priority: 2 },
+  '994': { name: 'أذربيجان', flag: '🇦🇿', priority: 2 },
+  '995': { name: 'جورجيا', flag: '🇬🇪', priority: 2 },
+  '374': { name: 'أرمينيا', flag: '🇦🇲', priority: 2 },
+  '855': { name: 'كمبوديا', flag: '🇰🇭', priority: 2 },
+  '856': { name: 'لاوس', flag: '🇱🇦', priority: 2 },
+  '673': { name: 'بروناي', flag: '🇧🇳', priority: 2 },
+  '670': { name: 'تيمور الشرقية', flag: '🇹🇱', priority: 2 },
+  '976': { name: 'منغوليا', flag: '🇲🇳', priority: 2 },
+  '850': { name: 'كوريا الشمالية', flag: '🇰🇵', priority: 2 },
+  '886': { name: 'تايوان', flag: '🇹🇼', priority: 2 },
+  '852': { name: 'هونغ كونغ', flag: '🇭🇰', priority: 2 },
+  '853': { name: 'ماكاو', flag: '🇲🇴', priority: 2 },
+  '7': { name: 'روسيا', flag: '🇷🇺', priority: 2 },
+  '55': { name: 'البرازيل', flag: '🇧🇷', priority: 3 },
+  '52': { name: 'المكسيك', flag: '🇲🇽', priority: 3 },
+  '54': { name: 'الأرجنتين', flag: '🇦🇷', priority: 3 },
+  '56': { name: 'تشيلي', flag: '🇨🇱', priority: 3 },
+  '57': { name: 'كولومبيا', flag: '🇨🇴', priority: 3 },
+  '51': { name: 'بيرو', flag: '🇵🇪', priority: 3 },
+  '58': { name: 'فنزويلا', flag: '🇻🇪', priority: 3 },
+  '593': { name: 'الإكوادور', flag: '🇪🇨', priority: 3 },
+  '591': { name: 'بوليفيا', flag: '🇧🇴', priority: 3 },
+  '595': { name: 'باراغواي', flag: '🇵🇾', priority: 3 },
+  '598': { name: 'الأوروغواي', flag: '🇺🇾', priority: 3 },
+  '506': { name: 'كوستاريكا', flag: '🇨🇷', priority: 3 },
+  '507': { name: 'بنما', flag: '🇵🇦', priority: 3 },
+  '503': { name: 'السلفادور', flag: '🇸🇻', priority: 3 },
+  '502': { name: 'غواتيمالا', flag: '🇬🇹', priority: 3 },
+  '504': { name: 'هندوراس', flag: '🇭🇳', priority: 3 },
+  '505': { name: 'نيكاراغوا', flag: '🇳🇮', priority: 3 },
+  '53': { name: 'كوبا', flag: '🇨🇺', priority: 3 },
+  '509': { name: 'هايتي', flag: '🇭🇹', priority: 3 },
+  '1809': { name: 'جمهورية الدومينيكان', flag: '🇩🇴', priority: 3 },
+  '1876': { name: 'جامايكا', flag: '🇯🇲', priority: 3 },
+  '592': { name: 'غيانا', flag: '🇬🇾', priority: 3 },
+  '597': { name: 'سورينام', flag: '🇸🇷', priority: 3 },
+  '27': { name: 'جنوب أفريقيا', flag: '🇿🇦', priority: 3 },
+  '234': { name: 'نيجيريا', flag: '🇳🇬', priority: 3 },
+  '254': { name: 'كينيا', flag: '🇰🇪', priority: 3 },
+  '233': { name: 'غانا', flag: '🇬🇭', priority: 3 },
+  '255': { name: 'تنزانيا', flag: '🇹🇿', priority: 3 },
+  '256': { name: 'أوغندا', flag: '🇺🇬', priority: 3 },
+  '251': { name: 'إثيوبيا', flag: '🇪🇹', priority: 3 },
+  '250': { name: 'رواندا', flag: '🇷🇼', priority: 3 },
+  '257': { name: 'بوروندي', flag: '🇧🇮', priority: 3 },
+  '260': { name: 'زامبيا', flag: '🇿🇲', priority: 3 },
+  '263': { name: 'زيمبابوي', flag: '🇿🇼', priority: 3 },
+  '265': { name: 'مالاوي', flag: '🇲🇼', priority: 3 },
+  '258': { name: 'موزمبيق', flag: '🇲🇿', priority: 3 },
+  '267': { name: 'بوتسوانا', flag: '🇧🇼', priority: 3 },
+  '264': { name: 'ناميبيا', flag: '🇳🇦', priority: 3 },
+  '268': { name: 'إسواتيني', flag: '🇸🇿', priority: 3 },
+  '266': { name: 'ليسوتو', flag: '🇱🇸', priority: 3 },
+  '221': { name: 'السنغال', flag: '🇸🇳', priority: 3 },
+  '223': { name: 'مالي', flag: '🇲🇱', priority: 3 },
+  '225': { name: 'ساحل العاج', flag: '🇨🇮', priority: 3 },
+  '226': { name: 'بوركينا فاسو', flag: '🇧🇫', priority: 3 },
+  '227': { name: 'النيجر', flag: '🇳🇪', priority: 3 },
+  '228': { name: 'توغو', flag: '🇹🇬', priority: 3 },
+  '229': { name: 'بنين', flag: '🇧🇯', priority: 3 },
+  '220': { name: 'غامبيا', flag: '🇬🇲', priority: 3 },
+  '224': { name: 'غينيا', flag: '🇬🇳', priority: 3 },
+  '245': { name: 'غينيا بيساو', flag: '🇬🇼', priority: 3 },
+  '232': { name: 'سيراليون', flag: '🇸🇱', priority: 3 },
+  '231': { name: 'ليبيريا', flag: '🇱🇷', priority: 3 },
+  '237': { name: 'الكاميرون', flag: '🇨🇲', priority: 3 },
+  '236': { name: 'جمهورية أفريقيا الوسطى', flag: '🇨🇫', priority: 3 },
+  '235': { name: 'تشاد', flag: '🇹🇩', priority: 3 },
+  '242': { name: 'الكونغو', flag: '🇨🇬', priority: 3 },
+  '243': { name: 'جمهورية الكونغو الديمقراطية', flag: '🇨🇩', priority: 3 },
+  '241': { name: 'الغابون', flag: '🇬🇦', priority: 3 },
+  '240': { name: 'غينيا الاستوائية', flag: '🇬🇶', priority: 3 },
+  '244': { name: 'أنغولا', flag: '🇦🇴', priority: 3 },
+  '261': { name: 'مدغشقر', flag: '🇲🇬', priority: 3 },
+  '230': { name: 'موريشيوس', flag: '🇲🇺', priority: 3 },
+  '248': { name: 'سيشل', flag: '🇸🇨', priority: 3 },
+  '262': { name: 'ريونيون', flag: '🇷🇪', priority: 3 },
+  '291': { name: 'إريتريا', flag: '🇪🇷', priority: 3 },
+  '61': { name: 'أستراليا', flag: '🇦🇺', priority: 3 },
+  '64': { name: 'نيوزيلندا', flag: '🇳🇿', priority: 3 },
+  '679': { name: 'فيجي', flag: '🇫🇯', priority: 3 },
+  '675': { name: 'بابوا غينيا الجديدة', flag: '🇵🇬', priority: 3 },
+  '687': { name: 'كاليدونيا الجديدة', flag: '🇳🇨', priority: 3 },
+  '689': { name: 'بولينيزيا الفرنسية', flag: '🇵🇫', priority: 3 },
+  '685': { name: 'ساموا', flag: '🇼🇸', priority: 3 },
+  '676': { name: 'تونغا', flag: '🇹🇴', priority: 3 },
+  '678': { name: 'فانواتو', flag: '🇻🇺', priority: 3 }
+};
+
+// ==================== Initialization ====================
 document.addEventListener('DOMContentLoaded', async () => {
   try {
-    // 1. الحصول على التبويب النشط
+    // 1. التحقق من فتح واتساب ويب
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-    // 2. التحقق من أن واتساب ويب مفتوح
     if (!tab.url || !tab.url.includes('web.whatsapp.com')) {
       updateStatus('error', '❌ الرجاء فتح واتساب ويب أولاً');
       exportBtn.disabled = true;
       return;
     }
 
-    // 3. تحديث الحالة
+    // 2. تحديث الحالة
     updateStatus('loading', '⏳ جارٍ حساب عدد جهات الاتصال...');
     exportBtn.disabled = true;
 
-    // 4. استخراج جهات الاتصال
+    // 3. استخراج جهات الاتصال
     const results = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: extractContactsFromWhatsApp
     });
 
-    // 🆕 5. حفظ النتائج مع التصنيفات في الذاكرة المؤقتة
+    // 4. حفظ النتائج
     const data = results[0].result;
     cachedContacts = data.contacts;
     availableLabels = data.availableLabels || [];
-    labelAssociations = data.labelAssociations || [];  // 🆕 حفظ العلاقات لحساب الأعداد الصحيحة
+    labelAssociations = data.labelAssociations || [];
     cachedTabId = tab.id;
 
-    // 🔍 DEBUG: ماذا استلمنا؟
-    console.log('📦 ===== Data Received in Popup =====');
-    console.log(`  Total contacts: ${cachedContacts.length}`);
-    console.log(`  Available labels: ${availableLabels.length}`);
-    console.log(`  Label associations: ${labelAssociations.length}`);
-    console.log('  Labels:', availableLabels);
-
-    // 🔍 DEBUG: عرض عدد كل تصنيف
-    availableLabels.forEach(label => {
-      const count = labelAssociations.filter(a => a.labelId === label.id).length;
-      console.log(`    - "${label.name}": ${count} associations`);
+    // 5. Debug
+    console.log('📦 Data:', {
+      contacts: cachedContacts.length,
+      labels: availableLabels.length,
+      associations: labelAssociations.length
     });
-    console.log('=====================================');
 
-    // 6. التحقق من وجود جهات اتصال
+    // 6. التحقق من وجود بيانات
     if (!cachedContacts || cachedContacts.length === 0) {
       updateStatus('error', '⚠️ لم يتم العثور على جهات اتصال');
-      countDiv.textContent = '0';
       exportBtn.disabled = true;
       return;
     }
 
-    // 7. حساب إحصائيات جهات الاتصال
+    // 7. حساب الإحصائيات
     contactStats = calculateContactStats(cachedContacts);
 
-    // 8. عرض العدد الإجمالي
-    countDiv.textContent = cachedContacts.length.toLocaleString('ar-EG');
-    countDiv.classList.add('animate');
+    // 8. عرض البطاقة الإجمالية
+    showSummaryCard();
 
-    // 9. عرض الإحصائيات
-    savedCountSpan.textContent = contactStats.saved.toLocaleString('ar-EG');
-    unsavedCountSpan.textContent = contactStats.unsaved.toLocaleString('ar-EG');
-    statsArea.style.display = 'flex';
+    // 9. عرض Accordion
+    showAccordion();
 
-    // 10. عرض الفلتر
-    filterArea.style.display = 'block';
-
-    // 🆕 11. عرض فلتر التصنيفات (إذا كانت موجودة)
-    console.log('🎨 ===== Rendering Labels Filter =====');
-    console.log(`  availableLabels.length: ${availableLabels.length}`);
-    console.log(`  Should show filter: ${availableLabels.length > 0}`);
-
+    // 10. إظهار خيار التصنيفات إذا كانت موجودة
     if (availableLabels.length > 0) {
-      console.log('  ✅ Showing labels filter area...');
-      renderLabelsFilter(availableLabels, cachedContacts);
-      labelsFilterArea.style.display = 'block';
-    } else {
-      console.log('  ❌ No labels available - filter area hidden');
+      labelFilterRadio.style.display = 'block';
+      initializeLabelsModal();
     }
-    console.log('======================================');
 
-    // 12. تحديث الحالة وتفعيل الزر
+    // 10.5. تجهيز بيانات الدول
+    contactsByCountry = groupContactsByCountry(cachedContacts);
+    availableCountries = buildAvailableCountries(contactsByCountry);
+
+    // 10.6. إظهار خيار الدول إذا كانت موجودة
+    if (availableCountries.length > 0) {
+      countriesFilterRadio.style.display = 'block';
+      initializeCountriesModal();
+    }
+
+    // 11. تحديث الملخص
+    updateFinalSummary();
+
+    // 12. إظهار المعلومات
+    infoArea.style.display = 'block';
+
+    // 13. تفعيل زر التصدير
     updateStatus('success', 'جاهز للتصدير');
     exportBtn.disabled = false;
 
-    // 🆕 13. تحديث ملخص التصدير
-    updateExportSummary();
-
-    // إزالة التأثير الحركي بعد ثانية
-    setTimeout(() => {
-      countDiv.classList.remove('animate');
-    }, 1000);
-
   } catch (error) {
-    console.error('خطأ في حساب العدد:', error);
+    console.error('خطأ:', error);
     updateStatus('error', '❌ حدث خطأ: ' + error.message);
     exportBtn.disabled = true;
   }
 });
 
-// ============================================
-// عند الضغط على زر التصدير
-// ============================================
+// ==================== UI Functions ====================
+
+function showSummaryCard() {
+  totalContactsCount.textContent = cachedContacts.length.toLocaleString('ar-EG');
+  savedCountTotal.textContent = contactStats.saved.toLocaleString('ar-EG');
+  unsavedCountTotal.textContent = contactStats.unsaved.toLocaleString('ar-EG');
+  summaryTotalCard.style.display = 'block';
+}
+
+function showAccordion() {
+  filterAccordion.style.display = 'block';
+}
+
+function updateStatus(type, message) {
+  statusDiv.textContent = message;
+  statusDiv.className = 'status-message';
+  if (type) {
+    statusDiv.classList.add(type);
+  }
+}
+
+function calculateContactStats(contacts) {
+  const stats = { saved: 0, unsaved: 0 };
+
+  contacts.forEach(contact => {
+    if (contact.type === 'جهة محفوظة') {
+      stats.saved++;
+    } else {
+      stats.unsaved++;
+    }
+  });
+
+  return stats;
+}
+
+// ==================== Accordion ====================
+
+accordionToggle.addEventListener('click', () => {
+  accordionContent.classList.toggle('active');
+
+  // تحديث السهم
+  const title = accordionToggle.querySelector('.accordion-title');
+  if (accordionContent.classList.contains('active')) {
+    title.textContent = '▲ اختيار نوع التصدير';
+  } else {
+    title.textContent = '▼ اختيار نوع التصدير';
+  }
+});
+
+// ==================== Radio Buttons ====================
+
+radioButtons.forEach(radio => {
+  radio.addEventListener('change', (e) => {
+    currentExportType = e.target.value;
+
+    // تحديث hint في الـ accordion header
+    const hint = accordionToggle.querySelector('.accordion-hint');
+    switch (currentExportType) {
+      case 'all':
+        hint.textContent = 'الكل';
+        labelsTriggerArea.style.display = 'none';
+        countriesTriggerArea.style.display = 'none';
+        break;
+      case 'saved':
+        hint.textContent = 'المحفوظ فقط';
+        labelsTriggerArea.style.display = 'none';
+        countriesTriggerArea.style.display = 'none';
+        break;
+      case 'unsaved':
+        hint.textContent = 'غير المحفوظ فقط';
+        labelsTriggerArea.style.display = 'none';
+        countriesTriggerArea.style.display = 'none';
+        break;
+      case 'labels':
+        hint.textContent = 'حسب التصنيفات';
+        labelsTriggerArea.style.display = 'block';
+        countriesTriggerArea.style.display = 'none';
+        break;
+      case 'countries':
+        hint.textContent = 'حسب الدولة';
+        labelsTriggerArea.style.display = 'none';
+        countriesTriggerArea.style.display = 'block';
+        break;
+    }
+
+    updateFinalSummary();
+  });
+});
+
+// ==================== Labels Modal ====================
+
+function initializeLabelsModal() {
+  // ملء قائمة التصنيفات
+  renderModalLabels();
+}
+
+function renderModalLabels() {
+  modalLabelsList.innerHTML = '';
+
+  availableLabels.forEach(label => {
+    const count = labelAssociations.filter(a => a.labelId === label.id).length;
+
+    const item = document.createElement('div');
+    item.className = 'modal-label-item';
+    item.dataset.labelName = label.name.toLowerCase();
+    item.innerHTML = `
+      <input type="checkbox" id="modal_label_${label.id}" value="${label.id}">
+      <label for="modal_label_${label.id}">${label.name}</label>
+      <span class="modal-label-count">${count}</span>
+    `;
+
+    const checkbox = item.querySelector('input');
+    checkbox.addEventListener('change', updateModalSelection);
+
+    modalLabelsList.appendChild(item);
+  });
+}
+
+// فتح Modal
+openLabelsModalBtn.addEventListener('click', () => {
+  labelsModal.classList.add('active');
+});
+
+// إغلاق Modal
+closeLabelsModalBtn.addEventListener('click', () => {
+  labelsModal.classList.remove('active');
+});
+
+labelsModal.addEventListener('click', (e) => {
+  if (e.target === labelsModal) {
+    labelsModal.classList.remove('active');
+  }
+});
+
+// البحث في التصنيفات
+labelsSearch.addEventListener('input', (e) => {
+  const searchTerm = e.target.value.toLowerCase().trim();
+
+  const items = modalLabelsList.querySelectorAll('.modal-label-item');
+  items.forEach(item => {
+    const labelName = item.dataset.labelName;
+    if (labelName.includes(searchTerm)) {
+      item.classList.remove('hidden');
+    } else {
+      item.classList.add('hidden');
+    }
+  });
+});
+
+// تحديد الكل
+modalSelectAll.addEventListener('click', () => {
+  const checkboxes = modalLabelsList.querySelectorAll('input[type="checkbox"]:not(.hidden input)');
+  const visibleCheckboxes = Array.from(modalLabelsList.querySelectorAll('.modal-label-item:not(.hidden) input[type="checkbox"]'));
+  visibleCheckboxes.forEach(cb => cb.checked = true);
+  updateModalSelection();
+});
+
+// إلغاء الكل
+modalDeselectAll.addEventListener('click', () => {
+  const checkboxes = modalLabelsList.querySelectorAll('input[type="checkbox"]');
+  checkboxes.forEach(cb => cb.checked = false);
+  updateModalSelection();
+});
+
+// تحديث التحديد
+function updateModalSelection() {
+  const checkboxes = modalLabelsList.querySelectorAll('input[type="checkbox"]:checked');
+  selectedLabelIds = Array.from(checkboxes).map(cb => cb.value);
+}
+
+// زر "تم"
+modalDoneBtn.addEventListener('click', () => {
+  labelsModal.classList.remove('active');
+  updateLabelsSummary();
+  updateFinalSummary();
+});
+
+function updateLabelsSummary() {
+  if (selectedLabelIds.length === 0) {
+    selectedLabelsSummary.textContent = 'لم يتم اختيار أي تصنيف';
+  } else if (selectedLabelIds.length === 1) {
+    const label = availableLabels.find(l => l.id === selectedLabelIds[0]);
+    selectedLabelsSummary.textContent = `تم اختيار: ${label.name}`;
+  } else {
+    selectedLabelsSummary.textContent = `تم اختيار ${selectedLabelIds.length} تصنيفات`;
+  }
+}
+
+// ==================== Countries Modal ====================
+
+function initializeCountriesModal() {
+  renderModalCountries();
+}
+
+function renderModalCountries() {
+  modalCountriesList.innerHTML = '';
+
+  availableCountries.forEach(country => {
+    const item = document.createElement('div');
+    item.className = 'modal-label-item';
+    item.dataset.countryName = country.name.toLowerCase();
+    item.innerHTML = `
+      <input type="checkbox" id="modal_country_${country.code}" value="${country.code}">
+      <label for="modal_country_${country.code}">${country.flag} ${country.name}</label>
+      <span class="modal-label-count">${country.count}</span>
+    `;
+
+    const checkbox = item.querySelector('input');
+    checkbox.addEventListener('change', updateModalCountriesSelection);
+
+    modalCountriesList.appendChild(item);
+  });
+}
+
+// فتح Modal
+openCountriesModalBtn.addEventListener('click', () => {
+  countriesModal.classList.add('active');
+});
+
+// إغلاق Modal
+closeCountriesModalBtn.addEventListener('click', () => {
+  countriesModal.classList.remove('active');
+});
+
+countriesModal.addEventListener('click', (e) => {
+  if (e.target === countriesModal) {
+    countriesModal.classList.remove('active');
+  }
+});
+
+// البحث في الدول
+countriesSearch.addEventListener('input', (e) => {
+  const searchTerm = e.target.value.toLowerCase().trim();
+
+  const items = modalCountriesList.querySelectorAll('.modal-label-item');
+  items.forEach(item => {
+    const countryName = item.dataset.countryName;
+    if (countryName.includes(searchTerm)) {
+      item.classList.remove('hidden');
+    } else {
+      item.classList.add('hidden');
+    }
+  });
+});
+
+// تحديد الكل
+modalSelectAllCountries.addEventListener('click', () => {
+  const visibleCheckboxes = Array.from(modalCountriesList.querySelectorAll('.modal-label-item:not(.hidden) input[type="checkbox"]'));
+  visibleCheckboxes.forEach(cb => cb.checked = true);
+  updateModalCountriesSelection();
+});
+
+// إلغاء الكل
+modalDeselectAllCountries.addEventListener('click', () => {
+  const checkboxes = modalCountriesList.querySelectorAll('input[type="checkbox"]');
+  checkboxes.forEach(cb => cb.checked = false);
+  updateModalCountriesSelection();
+});
+
+// تحديث التحديد
+function updateModalCountriesSelection() {
+  const checkboxes = modalCountriesList.querySelectorAll('input[type="checkbox"]:checked');
+  selectedCountryCodes = Array.from(checkboxes).map(cb => cb.value);
+}
+
+// زر "تم"
+modalCountriesDoneBtn.addEventListener('click', () => {
+  countriesModal.classList.remove('active');
+  updateCountriesSummary();
+  updateFinalSummary();
+});
+
+function updateCountriesSummary() {
+  if (selectedCountryCodes.length === 0) {
+    selectedCountriesSummary.textContent = 'لم يتم اختيار أي دولة';
+  } else if (selectedCountryCodes.length === 1) {
+    const country = availableCountries.find(c => c.code === selectedCountryCodes[0]);
+    selectedCountriesSummary.textContent = `تم اختيار: ${country.flag} ${country.name}`;
+  } else {
+    selectedCountriesSummary.textContent = `تم اختيار ${selectedCountryCodes.length} دولة`;
+  }
+}
+
+// ==================== Final Summary ====================
+
+function updateFinalSummary() {
+  if (!cachedContacts || cachedContacts.length === 0) {
+    finalSummary.style.display = 'none';
+    return;
+  }
+
+  let contactsToExport = getContactsToExport();
+  const count = contactsToExport.length;
+
+  exportCountFinal.textContent = count.toLocaleString('ar-EG');
+
+  // تحديث النص الوصفي
+  let description = '';
+  switch (currentExportType) {
+    case 'all':
+      description = 'سيتم تصدير <strong>' + count.toLocaleString('ar-EG') + '</strong> جهة اتصال (جميع الجهات).';
+      break;
+    case 'saved':
+      description = 'سيتم تصدير <strong>' + count.toLocaleString('ar-EG') + '</strong> جهة اتصال (المحفوظة فقط).';
+      break;
+    case 'unsaved':
+      description = 'سيتم تصدير <strong>' + count.toLocaleString('ar-EG') + '</strong> جهة اتصال (غير المحفوظة فقط).';
+      break;
+    case 'labels':
+      if (selectedLabelIds.length === 0) {
+        description = 'الرجاء اختيار تصنيف واحد على الأقل.';
+      } else {
+        description = 'سيتم تصدير <strong>' + count.toLocaleString('ar-EG') + '</strong> جهة اتصال من التصنيفات المحددة.';
+      }
+      break;
+    case 'countries':
+      if (selectedCountryCodes.length === 0) {
+        description = 'الرجاء اختيار دولة واحدة على الأقل.';
+      } else {
+        description = 'سيتم تصدير <strong>' + count.toLocaleString('ar-EG') + '</strong> جهة اتصال من الدول المحددة.';
+      }
+      break;
+  }
+
+  summaryDescription.innerHTML = description;
+  finalSummary.style.display = 'flex';
+}
+
+function getContactsToExport() {
+  let contacts = cachedContacts;
+
+  switch (currentExportType) {
+    case 'saved':
+      contacts = contacts.filter(c => c.type === 'جهة محفوظة');
+      break;
+    case 'unsaved':
+      contacts = contacts.filter(c => c.type !== 'جهة محفوظة');
+      break;
+    case 'labels':
+      if (selectedLabelIds.length > 0) {
+        const labelNames = selectedLabelIds.map(id => {
+          const label = availableLabels.find(l => l.id === id);
+          return label ? label.name : null;
+        }).filter(name => name !== null);
+
+        contacts = contacts.filter(contact => {
+          if (!contact.labels || contact.labels.length === 0) return false;
+          return contact.labels.some(label => labelNames.includes(label));
+        });
+      } else {
+        contacts = [];
+      }
+      break;
+    case 'countries':
+      if (selectedCountryCodes.length > 0) {
+        contacts = [];
+        selectedCountryCodes.forEach(code => {
+          if (contactsByCountry[code]) {
+            contacts = contacts.concat(contactsByCountry[code]);
+          }
+        });
+      } else {
+        contacts = [];
+      }
+      break;
+  }
+
+  return contacts;
+}
+
+// ==================== Export ====================
+
 exportBtn.addEventListener('click', async () => {
   try {
-    // 1. التحقق من وجود بيانات محفوظة
-    if (!cachedContacts || cachedContacts.length === 0) {
-      updateStatus('error', '⚠️ لا توجد جهات اتصال للتصدير');
-      return;
-    }
+    const contactsToExport = getContactsToExport();
 
-    // 2. تطبيق فلتر النوع
-    const filterValue = contactFilter.value;
-    let contactsToExport = filterContacts(cachedContacts, filterValue);
-
-    // 🆕 3. تطبيق فلتر التصنيفات
-    if (selectedLabelIds.length > 0) {
-      contactsToExport = filterContactsByLabels(contactsToExport, selectedLabelIds);
-    }
-
-    // 4. التحقق من وجود جهات بعد الفلترة
     if (contactsToExport.length === 0) {
-      updateStatus('error', '⚠️ لا توجد جهات اتصال مطابقة للفلاتر');
-      exportBtn.disabled = false;
+      if (currentExportType === 'labels' && selectedLabelIds.length === 0) {
+        updateStatus('error', '⚠️ الرجاء اختيار تصنيف واحد على الأقل');
+      } else if (currentExportType === 'countries' && selectedCountryCodes.length === 0) {
+        updateStatus('error', '⚠️ الرجاء اختيار دولة واحدة على الأقل');
+      } else {
+        updateStatus('error', '⚠️ لا توجد جهات اتصال مطابقة للفلاتر');
+      }
       return;
     }
 
-    // 4. تعطيل الزر وتحديث الحالة
     exportBtn.disabled = true;
     updateStatus('loading', '⏳ جارٍ تصدير جهات الاتصال...');
 
-    // 5. تحويل إلى CSV
     const csvContent = convertToCSV(contactsToExport);
-
-    // 4. تحميل الملف
     await downloadCSV(csvContent);
 
-    // 5. إظهار رسالة النجاح
     updateStatus('success', '✅ تم التصدير بنجاح!');
 
-    // 6. إعادة تفعيل الزر بعد 2 ثانية
     setTimeout(() => {
       exportBtn.disabled = false;
       updateStatus('success', 'جاهز للتصدير');
@@ -186,158 +738,15 @@ exportBtn.addEventListener('click', async () => {
   }
 });
 
-// تحديث رسالة الحالة
-function updateStatus(type, message) {
-  statusDiv.textContent = message;
-  statusDiv.className = 'status-message';
+// ==================== CSV Functions ====================
 
-  if (type) {
-    statusDiv.classList.add(type);
-  }
-}
-
-// حساب إحصائيات جهات الاتصال
-function calculateContactStats(contacts) {
-  const stats = { saved: 0, unsaved: 0, chat: 0 };
-
-  contacts.forEach(contact => {
-    if (contact.type === 'جهة محفوظة') {
-      stats.saved++;
-    } else if (contact.type === 'غير محفوظ') {
-      stats.unsaved++;
-    } else if (contact.type === 'محادثة') {
-      stats.chat++;
-    }
-  });
-
-  // إضافة المحادثات إلى غير المحفوظة
-  stats.unsaved += stats.chat;
-
-  return stats;
-}
-
-// تطبيق الفلتر على جهات الاتصال
-function filterContacts(contacts, filterType) {
-  if (filterType === 'all') {
-    return contacts;
-  } else if (filterType === 'saved') {
-    return contacts.filter(c => c.type === 'جهة محفوظة');
-  } else if (filterType === 'unsaved') {
-    return contacts.filter(c => c.type === 'غير محفوظ' || c.type === 'محادثة');
-  }
-  return contacts;
-}
-
-// 🆕 عرض قائمة التصنيفات
-function renderLabelsFilter(labels, contacts) {
-  labelsList.innerHTML = '';
-
-  labels.forEach(label => {
-    // 🔧 حساب العدد الحقيقي من labelAssociations (جميع الجهات في WhatsApp، ليس فقط المستخرجة)
-    const count = labelAssociations.filter(assoc =>
-      assoc.labelId === label.id
-    ).length;
-
-    // إنشاء عنصر checkbox
-    const item = document.createElement('div');
-    item.className = 'label-checkbox-item';
-    item.innerHTML = `
-      <input type="checkbox" id="label_${label.id}" value="${label.id}">
-      <label for="label_${label.id}">${label.name}</label>
-      <span class="label-count">${count}</span>
-    `;
-
-    // إضافة event listener
-    const checkbox = item.querySelector('input');
-    checkbox.addEventListener('change', updateSelectedLabels);
-
-    labelsList.appendChild(item);
-  });
-}
-
-// 🆕 تحديد جميع التصنيفات
-selectAllLabelsBtn.addEventListener('click', () => {
-  const checkboxes = labelsList.querySelectorAll('input[type="checkbox"]');
-  checkboxes.forEach(cb => cb.checked = true);
-  updateSelectedLabels();
-});
-
-// 🆕 إلغاء تحديد جميع التصنيفات
-deselectAllLabelsBtn.addEventListener('click', () => {
-  const checkboxes = labelsList.querySelectorAll('input[type="checkbox"]');
-  checkboxes.forEach(cb => cb.checked = false);
-  updateSelectedLabels();
-});
-
-// 🆕 تحديث ملخص التصدير عند تغيير فلتر النوع
-contactFilter.addEventListener('change', () => {
-  updateExportSummary();
-});
-
-// 🆕 تحديث قائمة التصنيفات المحددة
-function updateSelectedLabels() {
-  const checkboxes = labelsList.querySelectorAll('input[type="checkbox"]:checked');
-  selectedLabelIds = Array.from(checkboxes).map(cb => cb.value);
-  selectedLabelsCount.textContent = selectedLabelIds.length;
-
-  // 🆕 تحديث ملخص التصدير
-  updateExportSummary();
-}
-
-// 🆕 حساب وتحديث ملخص التصدير
-function updateExportSummary() {
-  if (!cachedContacts || cachedContacts.length === 0) {
-    exportSummary.style.display = 'none';
-    return;
-  }
-
-  // تطبيق فلتر النوع
-  const filterValue = contactFilter.value;
-  let contactsToExport = filterContacts(cachedContacts, filterValue);
-
-  // تطبيق فلتر التصنيفات
-  if (selectedLabelIds.length > 0) {
-    contactsToExport = filterContactsByLabels(contactsToExport, selectedLabelIds);
-  }
-
-  // تحديث العرض
-  const count = contactsToExport.length;
-  exportCount.textContent = `${count.toLocaleString('ar-EG')} جهة اتصال`;
-
-  // إظهار الملخص
-  exportSummary.style.display = 'block';
-}
-
-// 🆕 فلترة جهات الاتصال حسب التصنيفات
-function filterContactsByLabels(contacts, labelIds) {
-  if (labelIds.length === 0) return contacts;
-
-  // تحويل IDs إلى أسماء
-  const labelNames = labelIds.map(id => {
-    const label = availableLabels.find(l => l.id === id);
-    return label ? label.name : null;
-  }).filter(name => name !== null);
-
-  // فلترة جهات الاتصال
-  return contacts.filter(contact => {
-    if (!contact.labels || contact.labels.length === 0) return false;
-
-    // التحقق من وجود أي تصنيف محدد
-    return contact.labels.some(label => labelNames.includes(label));
-  });
-}
-
-// تحويل البيانات إلى CSV
 function convertToCSV(contacts) {
-  // 🆕 العنوان مع التصنيفات
   let csv = 'الاسم,رقم الهاتف,النوع,التصنيفات\n';
 
-  // إضافة كل جهة اتصال
   contacts.forEach(contact => {
     const name = escapeCSV(contact.name || 'غير محدد');
     const phone = escapeCSV(contact.phone);
     const type = escapeCSV(contact.type);
-    // 🆕 التصنيفات مفصولة بفاصلة منقوطة
     const labels = escapeCSV(
       contact.labels && contact.labels.length > 0
         ? contact.labels.join('; ')
@@ -350,116 +759,172 @@ function convertToCSV(contacts) {
   return csv;
 }
 
-// تجهيز النص لـ CSV (معالجة الفواصل والاقتباسات)
 function escapeCSV(text) {
   if (!text) return '';
-  // استبدال الاقتباسات المزدوجة بـ اثنين
   return text.toString().replace(/"/g, '""');
 }
 
-// تحميل ملف CSV
 async function downloadCSV(csvContent) {
-  // إنشاء Blob
-  const BOM = '\uFEFF'; // UTF-8 BOM للدعم الكامل للعربية في Excel
+  const BOM = '\uFEFF';
   const blob = new Blob([BOM + csvContent], {
     type: 'text/csv;charset=utf-8;'
   });
 
-  // إنشاء URL
   const url = URL.createObjectURL(blob);
 
-  // اسم الملف مع التاريخ والوقت
   const now = new Date();
   const timestamp = now.toISOString().slice(0, 10) + '_' +
                    now.toTimeString().slice(0, 5).replace(':', '-');
   const filename = `botifiy_contacts_${timestamp}.csv`;
 
-  // تحميل الملف
   await chrome.downloads.download({
     url: url,
     filename: filename,
     saveAs: true
   });
 
-  // تنظيف الذاكرة
   setTimeout(() => URL.revokeObjectURL(url), 100);
 }
 
-// ============================================
-// دالة مساعدة للتحقق من صحة رقم الهاتف
-// ============================================
+// ==================== Utility Functions ====================
+
 function isValidPhoneNumber(phoneNumber) {
-  // التحقق من أن الرقم يحتوي على أرقام فقط
   if (!/^\d+$/.test(phoneNumber)) {
     return false;
   }
-
-  // أرقام الهواتف الدولية الصحيحة تتراوح بين 10-13 رقم
-  // أرقام 14-15 رقم هي WhatsApp IDs داخلية
   const length = phoneNumber.length;
   return length >= 10 && length <= 13;
 }
 
-// ============================================
-// دالة الاستخراج - يتم حقنها في صفحة واتساب
-// ============================================
+// ==================== Country Detection Functions ====================
+
+function detectCountryCode(phoneNumber) {
+  if (!phoneNumber || typeof phoneNumber !== 'string') return null;
+
+  // تنظيف الرقم
+  const cleanNumber = phoneNumber.replace(/[^0-9]/g, '');
+
+  // محاولة المطابقة مع country codes (من الأطول للأقصر)
+  // الترتيب: 3 أرقام، ثم 2، ثم 1
+  for (let len = 3; len >= 1; len--) {
+    const code = cleanNumber.substring(0, len);
+    if (COUNTRY_CODES[code]) {
+      return code;
+    }
+  }
+
+  return null;
+}
+
+function groupContactsByCountry(contacts) {
+  const countryGroups = {};
+  const unknownContacts = [];
+
+  contacts.forEach(contact => {
+    // تجاهل المجموعات وقوائم البث
+    if (contact.type === 'مجموعة' || contact.type === 'قائمة بث') {
+      return;
+    }
+
+    const countryCode = detectCountryCode(contact.phone);
+
+    if (countryCode && COUNTRY_CODES[countryCode]) {
+      if (!countryGroups[countryCode]) {
+        countryGroups[countryCode] = [];
+      }
+      countryGroups[countryCode].push(contact);
+    } else {
+      unknownContacts.push(contact);
+    }
+  });
+
+  // إضافة مجموعة "غير معروف" إذا كانت موجودة
+  if (unknownContacts.length > 0) {
+    countryGroups['unknown'] = unknownContacts;
+  }
+
+  return countryGroups;
+}
+
+function buildAvailableCountries(contactsByCountry) {
+  const countries = [];
+
+  Object.keys(contactsByCountry).forEach(code => {
+    const count = contactsByCountry[code].length;
+
+    if (code === 'unknown') {
+      countries.push({
+        code: 'unknown',
+        name: 'غير معروف',
+        flag: '❓',
+        count: count,
+        priority: 3
+      });
+    } else {
+      const countryInfo = COUNTRY_CODES[code];
+      countries.push({
+        code: code,
+        name: countryInfo.name,
+        flag: countryInfo.flag,
+        count: count,
+        priority: countryInfo.priority
+      });
+    }
+  });
+
+  // ترتيب حسب الأولوية ثم حسب العدد
+  countries.sort((a, b) => {
+    if (a.priority !== b.priority) {
+      return a.priority - b.priority;
+    }
+    return b.count - a.count;
+  });
+
+  return countries;
+}
+
+// ==================== WhatsApp Data Extraction ====================
+
 function extractContactsFromWhatsApp() {
   return new Promise((resolve, reject) => {
     const contacts = [];
-    const seenNumbers = new Set(); // لمنع التكرار
-    let unsavedCounter = 1; // عداد للأسماء الوهمية للجهات غير المحفوظة
+    const seenNumbers = new Set();
+    let unsavedCounter = 1;
 
-    // 🆕 متغيرات للتصنيفات
-    const allLabels = [];          // جميع التصنيفات
-    const labelAssociations = [];  // العلاقات بين التصنيفات والمحادثات
+    const allLabels = [];
+    const labelAssociations = [];
 
-    // دالة التحقق من صحة رقم الهاتف (نسخة داخلية)
     function isValidPhoneNumber(phoneNumber) {
       if (!/^\d+$/.test(phoneNumber)) return false;
       const length = phoneNumber.length;
-      return length >= 10 && length <= 13;  // تم التعديل من 15 إلى 13
+      return length >= 10 && length <= 13;
     }
 
-    // 🆕 دالة مساعدة: الحصول على تصنيفات جهة اتصال
     function getLabelsForContact(contactId) {
       const labelNames = [];
-
-      // البحث عن جميع التصنيفات المرتبطة بهذه الجهة
       labelAssociations.forEach(assoc => {
         if (assoc.associationId === contactId) {
-          // البحث عن اسم التصنيف
           const label = allLabels.find(l => l.id === assoc.labelId);
           if (label) {
             labelNames.push(label.name);
           }
         }
       });
-
       return labelNames;
     }
 
-    // 🆕 دالة مساعدة: التحقق من وجود تصنيف لهذه الجهة
     function hasAnyLabel(contactId) {
       return labelAssociations.some(assoc => assoc.associationId === contactId);
     }
 
-    // 🆕 دالة محسنة للتحقق من صحة الهوية (أكثر شمولاً)
     function isValidContactId(contactId) {
-      // نقبل أي ID صالح من WhatsApp
       if (!contactId || typeof contactId !== 'string') return false;
-
-      // نقبل:
-      // - @c.us (محادثات فردية)
-      // - @g.us (مجموعات)
-      // - @broadcast (broadcast lists)
-      // - @lid (أرقام status/channels)
       return contactId.includes('@c.us') ||
              contactId.includes('@g.us') ||
              contactId.includes('@broadcast') ||
              contactId.includes('@lid');
     }
 
-    // فتح قاعدة بيانات واتساب IndexedDB
     const dbRequest = indexedDB.open('model-storage');
 
     dbRequest.onerror = () => {
@@ -469,150 +934,95 @@ function extractContactsFromWhatsApp() {
     dbRequest.onsuccess = (event) => {
       const db = event.target.result;
 
-      // 🔍 DEBUG: طباعة جميع أسماء الجداول المتاحة
-      console.log('🗄️ ===== WhatsApp IndexedDB Object Stores =====');
-      console.log(`📊 Total stores: ${db.objectStoreNames.length}`);
-      for (let i = 0; i < db.objectStoreNames.length; i++) {
-        const storeName = db.objectStoreNames[i];
-        console.log(`  ${i + 1}. "${storeName}"`);
-      }
-      console.log('==============================================');
-
-      // التحقق من وجود الجداول المطلوبة
       if (!db.objectStoreNames.contains('contact') ||
           !db.objectStoreNames.contains('chat')) {
         db.close();
-        reject(new Error('قاعدة البيانات غير جاهزة. حاول تحديث الصفحة'));
+        reject(new Error('قاعدة البيانات غير جاهزة'));
         return;
       }
 
       try {
-        // 🆕 التحقق من وجود جداول التصنيفات (WhatsApp Business)
         const hasLabels = db.objectStoreNames.contains('label') &&
                           db.objectStoreNames.contains('label-association');
 
-        // 🔍 DEBUG: حالة التصنيفات
-        console.log('🏷️ ===== Labels Detection =====');
-        console.log(`  Has 'label' store: ${db.objectStoreNames.contains('label')}`);
-        console.log(`  Has 'label-association' store: ${db.objectStoreNames.contains('label-association')}`);
-        console.log(`  Final hasLabels: ${hasLabels}`);
-        console.log('===============================');
-
-        // إنشاء معاملة قراءة
         const storeNames = ['contact', 'chat'];
         if (hasLabels) {
           storeNames.push('label', 'label-association');
         }
         const transaction = db.transaction(storeNames, 'readonly');
 
-        // متغيرات للتتبع
         let contactsProcessed = false;
         let chatsProcessed = false;
-        let labelsProcessed = !hasLabels;      // 🆕 إذا لم تكن موجودة، اعتبرها معالجة
-        let labelItemsProcessed = !hasLabels;  // 🆕
+        let labelsProcessed = !hasLabels;
+        let labelItemsProcessed = !hasLabels;
 
-        // ========================================
-        // 🆕 الخطوة 1: استخراج تعريفات التصنيفات
-        // ========================================
+        // Extract labels
         if (hasLabels) {
           try {
             const labelStore = transaction.objectStore('label');
             const labelRequest = labelStore.openCursor();
 
             labelRequest.onsuccess = (e) => {
-            const cursor = e.target.result;
-            if (cursor) {
-              const label = cursor.value;
-
-              // 🔍 DEBUG: طباعة بنية أول تصنيف فقط
-              if (allLabels.length === 0) {
-                console.log('🏷️ ===== First Label Structure =====');
-                console.log('Label keys:', Object.keys(label));
-                console.log('Label sample:', label);
-                console.log('====================================');
+              const cursor = e.target.result;
+              if (cursor) {
+                const label = cursor.value;
+                if (label.id && label.name) {
+                  allLabels.push({
+                    id: label.id,
+                    name: label.name
+                  });
+                }
+                cursor.continue();
+              } else {
+                labelsProcessed = true;
+                checkCompletion();
               }
+            };
 
-              if (label.id && label.name) {
-                allLabels.push({
-                  id: label.id,
-                  name: label.name
-                });
-              }
-              cursor.continue();
-            } else {
-              // 🔍 DEBUG: عدد التصنيفات المستخرجة
-              console.log(`✅ Labels extracted: ${allLabels.length}`);
-              console.log('Labels:', allLabels);
-
+            labelRequest.onerror = () => {
               labelsProcessed = true;
               checkCompletion();
-            }
-          };
-
-          labelRequest.onerror = () => {
-            console.error('❌ Error reading labels');
-            labelsProcessed = true;
-            checkCompletion();
-          };
+            };
           } catch (error) {
-            console.error('❌ Exception accessing label store:', error);
             labelsProcessed = true;
             checkCompletion();
           }
         }
 
-        // ========================================
-        // 🆕 الخطوة 2: استخراج علاقات التصنيفات
-        // ========================================
+        // Extract label associations
         if (hasLabels) {
           try {
             const labelItemsStore = transaction.objectStore('label-association');
             const labelItemsRequest = labelItemsStore.openCursor();
 
-          labelItemsRequest.onsuccess = (e) => {
-            const cursor = e.target.result;
-            if (cursor) {
-              const item = cursor.value;
-
-              // 🔍 DEBUG: طباعة بنية أول label item فقط
-              if (labelAssociations.length === 0) {
-                console.log('🔗 ===== First Label Item Structure =====');
-                console.log('Item keys:', Object.keys(item));
-                console.log('Item sample:', item);
-                console.log('=========================================');
+            labelItemsRequest.onsuccess = (e) => {
+              const cursor = e.target.result;
+              if (cursor) {
+                const item = cursor.value;
+                if (item.labelId && item.associationId) {
+                  labelAssociations.push({
+                    labelId: item.labelId,
+                    associationId: item.associationId
+                  });
+                }
+                cursor.continue();
+              } else {
+                labelItemsProcessed = true;
+                checkCompletion();
               }
+            };
 
-              if (item.labelId && item.associationId) {
-                labelAssociations.push({
-                  labelId: item.labelId,
-                  associationId: item.associationId
-                });
-              }
-              cursor.continue();
-            } else {
-              // 🔍 DEBUG: عدد العلاقات المستخرجة
-              console.log(`✅ Label associations extracted: ${labelAssociations.length}`);
-
+            labelItemsRequest.onerror = () => {
               labelItemsProcessed = true;
               checkCompletion();
-            }
-          };
-
-          labelItemsRequest.onerror = () => {
-            console.error('❌ Error reading label items');
-            labelItemsProcessed = true;
-            checkCompletion();
-          };
+            };
           } catch (error) {
-            console.error('❌ Exception accessing label-association store:', error);
             labelItemsProcessed = true;
             checkCompletion();
           }
         }
 
-        // ========================================
-        // الخطوة 3: استخراج جهات الاتصال المحفوظة
-        // ========================================
+        // Extract contacts
         const contactStore = transaction.objectStore('contact');
         const contactRequest = contactStore.openCursor();
 
@@ -622,11 +1032,9 @@ function extractContactsFromWhatsApp() {
           if (cursor) {
             const contact = cursor.value;
 
-            // فقط جهات الاتصال المحفوظة
             if (contact.isAddressBookContact === 1 && contact.id) {
               const phoneNumber = contact.id.split('@')[0];
 
-              // ✅ التحقق من صحة رقم الهاتف (استبعاد WhatsApp IDs الداخلية)
               if (phoneNumber &&
                   isValidPhoneNumber(phoneNumber) &&
                   !seenNumbers.has(phoneNumber)) {
@@ -635,8 +1043,8 @@ function extractContactsFromWhatsApp() {
                   name: contact.name || contact.pushname || phoneNumber,
                   phone: phoneNumber,
                   type: 'جهة محفوظة',
-                  labels: [],  // سيتم تعبئتها لاحقاً بعد اكتمال labelAssociations
-                  contactId: contact.id  // 🆕 حفظ ID لاستخدامه لاحقاً
+                  labels: [],
+                  contactId: contact.id
                 });
                 seenNumbers.add(phoneNumber);
               }
@@ -654,9 +1062,7 @@ function extractContactsFromWhatsApp() {
           checkCompletion();
         };
 
-        // ========================================
-        // الخطوة 2: استخراج المحادثات (جهات غير محفوظة، مجموعات، broadcast lists)
-        // ========================================
+        // Extract chats
         const chatStore = transaction.objectStore('chat');
         const chatRequest = chatStore.openCursor();
 
@@ -666,22 +1072,16 @@ function extractContactsFromWhatsApp() {
           if (cursor) {
             const chat = cursor.value;
 
-            // 🔧 نقبل جميع أنواع المحادثات (فردية، مجموعات، broadcast)
             if (chat.id && isValidContactId(chat.id)) {
               const phoneNumber = chat.id.split('@')[0];
               const uniqueKey = phoneNumber || chat.id;
 
-              // ✅ نستخرج الجهة إذا:
-              // 1. رقم هاتف صالح (للمحادثات الفردية)
-              // 2. مجموعة أو broadcast (لأنها قد تحتوي على تصنيفات)
               const hasValidPhone = phoneNumber && isValidPhoneNumber(phoneNumber);
               const isGroupOrBroadcast = chat.id.includes('@g.us') || chat.id.includes('@broadcast');
 
               if ((hasValidPhone || isGroupOrBroadcast) && !seenNumbers.has(uniqueKey)) {
-                // محاولة الحصول على الاسم
                 let name = chat.name || chat.formattedTitle || chat.pushname || null;
 
-                // تحديد النوع
                 let contactType;
                 if (chat.id.includes('@g.us')) {
                   contactType = 'مجموعة';
@@ -702,8 +1102,8 @@ function extractContactsFromWhatsApp() {
                   name: name,
                   phone: phoneNumber || chat.id.split('@')[0],
                   type: contactType,
-                  labels: [],  // سيتم تعبئتها لاحقاً بعد اكتمال labelAssociations
-                  contactId: chat.id  // 🆕 حفظ ID لاستخدامه لاحقاً
+                  labels: [],
+                  contactId: chat.id
                 });
                 seenNumbers.add(uniqueKey);
               }
@@ -721,55 +1121,33 @@ function extractContactsFromWhatsApp() {
           checkCompletion();
         };
 
-        // ========================================
-        // 🆕 التحقق من اكتمال جميع العمليات
-        // ========================================
         function checkCompletion() {
-          // 🔍 DEBUG: حالة الإكمال
-          console.log('🔄 ===== Check Completion =====');
-          console.log(`  contactsProcessed: ${contactsProcessed}`);
-          console.log(`  chatsProcessed: ${chatsProcessed}`);
-          console.log(`  labelsProcessed: ${labelsProcessed}`);
-          console.log(`  labelItemsProcessed: ${labelItemsProcessed}`);
-          console.log(`  Total contacts: ${contacts.length}`);
-          console.log(`  Total labels: ${allLabels.length}`);
-          console.log(`  Total associations: ${labelAssociations.length}`);
-          console.log('===============================');
-
           if (contactsProcessed && chatsProcessed &&
               labelsProcessed && labelItemsProcessed) {
 
-            // 🆕 الخطوة 3: استخراج الجهات المفقودة من labelAssociations
-            console.log('🔍 ===== Extracting Missing Contacts from Labels =====');
-            console.log(`  Contacts before: ${contacts.length}`);
-
+            // Extract missing contacts from labelAssociations
             let missingAdded = 0;
             const extractedIds = new Set();
 
-            // جمع جميع IDs المستخرجة
             contacts.forEach(contact => {
               if (contact.contactId) {
                 extractedIds.add(contact.contactId);
               }
             });
 
-            // البحث عن الجهات المفقودة في labelAssociations
             labelAssociations.forEach(assoc => {
               const contactId = assoc.associationId;
 
-              // إذا لم نستخرج هذه الجهة من قبل
               if (!extractedIds.has(contactId)) {
-                // فقط @c.us (محادثات فردية)
                 if (contactId.includes('@c.us')) {
                   const phoneNumber = contactId.split('@')[0];
 
-                  // التحقق من صحة رقم الهاتف
                   if (phoneNumber && isValidPhoneNumber(phoneNumber)) {
                     contacts.push({
-                      name: phoneNumber, // استخدام الرقم كاسم
+                      name: phoneNumber,
                       phone: phoneNumber,
-                      type: 'محذوف', // جهة محذوفة من المحادثات
-                      labels: [],  // سيتم تعبئتها لاحقاً
+                      type: 'محذوف',
+                      labels: [],
                       contactId: contactId
                     });
                     extractedIds.add(contactId);
@@ -779,60 +1157,31 @@ function extractContactsFromWhatsApp() {
               }
             });
 
-            console.log(`  Missing contacts added: ${missingAdded}`);
-            console.log(`  Contacts after: ${contacts.length}`);
-            console.log('=====================================================');
-
-            // 🆕 تعيين التصنيفات لجهات الاتصال (بعد اكتمال جميع البيانات)
-            console.log('🔗 ===== Mapping Labels to Contacts =====');
-            console.log(`  Processing ${contacts.length} contacts...`);
-            let contactsWithLabels = 0;
-            let groupCount = 0;
-            let broadcastCount = 0;
-
+            // Map labels to contacts
             contacts.forEach(contact => {
               if (contact.contactId) {
                 contact.labels = getLabelsForContact(contact.contactId);
-                if (contact.labels.length > 0) {
-                  contactsWithLabels++;
-                }
-                // إحصائيات
-                if (contact.type === 'مجموعة') groupCount++;
-                if (contact.type === 'قائمة بث') broadcastCount++;
-                // حذف contactId (لا نحتاجه في التصدير)
                 delete contact.contactId;
               }
             });
 
-            console.log(`  ✅ ${contactsWithLabels} contacts have labels`);
-            console.log(`  📊 Groups: ${groupCount}, Broadcasts: ${broadcastCount}`);
-            console.log('========================================');
-
             db.close();
 
-            // ترتيب النتائج: المحفوظة أولاً
+            // Sort
             contacts.sort((a, b) => {
               if (a.type === 'جهة محفوظة' && b.type !== 'جهة محفوظة') return -1;
               if (a.type !== 'جهة محفوظة' && b.type === 'جهة محفوظة') return 1;
               return a.name.localeCompare(b.name);
             });
 
-            // 🆕 إرجاع البيانات مع قائمة التصنيفات المتاحة والعلاقات
-            console.log('🎉 ===== Final Result =====');
-            console.log(`  Returning ${contacts.length} contacts`);
-            console.log(`  Returning ${allLabels.length} labels`);
-            console.log(`  Returning ${labelAssociations.length} label associations`);
-            console.log('===========================');
-
             resolve({
               contacts: contacts,
               availableLabels: allLabels,
-              labelAssociations: labelAssociations  // 🆕 إرجاع العلاقات لحساب الأعداد الصحيحة
+              labelAssociations: labelAssociations
             });
           }
         }
 
-        // معالجة أخطاء المعاملة
         transaction.onerror = () => {
           db.close();
           reject(new Error('خطأ في قراءة البيانات'));
